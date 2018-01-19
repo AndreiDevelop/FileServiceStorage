@@ -819,7 +819,6 @@ MonoBehaviour:
   IdentityPoolId: 
   CognitoIdentityRegion: us-east-1
   S3Region: us-east-1
-  S3BucketName: llvr
   SampleFileName: 2110.txt
   GetBucketListButton: {fileID: 1441414886}
   PostBucketButton: {fileID: 408278450}
@@ -827,6 +826,7 @@ MonoBehaviour:
   DeleteObjectButton: {fileID: 26935727}
   GetObjectButton: {fileID: 26087703}
   ResultText: {fileID: 671027699}
+  _catImage: {fileID: 21300000, guid: 03859e17d9db1934e8a501825072c41a, type: 3}
 --- !u!4 &925414697
 Transform:
   m_ObjectHideFlags: 0

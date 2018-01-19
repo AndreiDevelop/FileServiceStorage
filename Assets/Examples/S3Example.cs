@@ -30,6 +30,8 @@ namespace AWSSDK.Examples
 {
     public class S3Example : MonoBehaviour
     {
+		private const string S3_BUCKET_NAME = "llvr";
+		private const string URL_FIRST_PARTH = "https://s3.amazonaws.com/" + S3_BUCKET_NAME + "/";
 		private const string ACCESS_KEY = "AKIAJHPTOQGQXX5USTNA";
 		private const string SECRET_KEY = "2IbnY1FRwIJdGyJJQblE0OpTuieA97C6gmdv+/kF";
 
@@ -44,7 +46,7 @@ namespace AWSSDK.Examples
         {
             get { return RegionEndpoint.GetBySystemName(S3Region); }
         }
-        public string S3BucketName = null;
+        
         public string SampleFileName = null;
         public Button GetBucketListButton = null;
         public Button PostBucketButton = null;
@@ -52,6 +54,9 @@ namespace AWSSDK.Examples
         public Button DeleteObjectButton = null;
         public Button GetObjectButton = null;
         public Text ResultText = null;
+
+		[SerializeField]
+		private Sprite _catImage;
 
         void Start()
         {
@@ -134,8 +139,8 @@ namespace AWSSDK.Examples
         /// </summary>
         private void GetObject()
         {
-            ResultText.text = string.Format("fetching {0} from bucket {1}", SampleFileName, S3BucketName);
-            Client.GetObjectAsync(S3BucketName, SampleFileName, (responseObj) =>
+			ResultText.text = string.Format("fetching {0} from bucket {1}", SampleFileName, S3_BUCKET_NAME);
+			Client.GetObjectAsync(S3_BUCKET_NAME, SampleFileName, (responseObj) =>
             {
                 string data = null;
                 var response = responseObj.Response;
@@ -159,14 +164,14 @@ namespace AWSSDK.Examples
         {
             ResultText.text = "Retrieving the file";
 
-            string fileName = GetFileHelper();
+			string fileName = GetFileHelper();
              
-            var stream = new FileStream(Application.persistentDataPath + Path.DirectorySeparatorChar + fileName, FileMode.Open, FileAccess.Read, FileShare.Read);
+			var stream = new FileStream(Application.persistentDataPath + Path.DirectorySeparatorChar + fileName, FileMode.Open, FileAccess.Read, FileShare.Read);
 
             ResultText.text += "\nCreating request object";
             var request = new PostObjectRequest()
             {
-				Bucket = S3BucketName,
+				Bucket = S3_BUCKET_NAME,
                 Key = fileName,
                 InputStream = stream,
 				CannedACL = S3CannedACL.PublicRead,
@@ -186,6 +191,7 @@ namespace AWSSDK.Examples
                 if (responseObj.Exception == null)
                 {
                     ResultText.text += string.Format("\nobject {0} posted to bucket {1}", responseObj.Request.Key, responseObj.Request.Bucket);
+					Debug.Log(URL_FIRST_PARTH + SampleFileName);
                 }
                 else
                 {
@@ -201,11 +207,11 @@ namespace AWSSDK.Examples
         /// </summary>
         public void GetObjects()
         {
-            ResultText.text = "Fetching all the Objects from " + S3BucketName;
+			ResultText.text = "Fetching all the Objects from " + S3_BUCKET_NAME;
 
             var request = new ListObjectsRequest()
             {
-                BucketName = S3BucketName
+				BucketName = S3_BUCKET_NAME
             };
 
             Client.ListObjectsAsync(request, (responseObject) =>
@@ -232,7 +238,7 @@ namespace AWSSDK.Examples
         /// </summary>
         public void DeleteObject()
         {
-            ResultText.text = string.Format("deleting {0} from bucket {1}", SampleFileName, S3BucketName);
+			ResultText.text = string.Format("deleting {0} from bucket {1}", SampleFileName, S3_BUCKET_NAME);
             List<KeyVersion> objects = new List<KeyVersion>();
             objects.Add(new KeyVersion()
             {
@@ -241,7 +247,7 @@ namespace AWSSDK.Examples
 
             var request = new DeleteObjectsRequest()
             {
-                BucketName = S3BucketName,
+				BucketName = S3_BUCKET_NAME,
                 Objects = objects
             };
 
@@ -270,7 +276,7 @@ namespace AWSSDK.Examples
 
         #region helper methods
 
-        private string GetFileHelper()
+		private string GetFileHelper()
         {
             var fileName = SampleFileName;
 
