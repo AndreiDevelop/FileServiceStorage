@@ -30,6 +30,9 @@ namespace AWSSDK.Examples
 {
     public class S3Example : MonoBehaviour
     {
+		[SerializeField]
+		private string _pathToImages = string.Empty; 
+
 		private const string S3_BUCKET_NAME = "llvr";
 		private const string URL_FIRST_PARTH = "https://s3.amazonaws.com/" + S3_BUCKET_NAME + "/";
 		private const string ACCESS_KEY = "AKIAJHPTOQGQXX5USTNA";
@@ -54,9 +57,6 @@ namespace AWSSDK.Examples
         public Button DeleteObjectButton = null;
         public Button GetObjectButton = null;
         public Text ResultText = null;
-
-		[SerializeField]
-		private Sprite _catImage;
 
         void Start()
         {
@@ -201,6 +201,42 @@ namespace AWSSDK.Examples
                 }
             });
         }
+
+		public void PostImage(string fileName)
+		{
+			ResultText.text = "Retrieving the file";
+
+			var stream = new FileStream(Application.dataPath + _pathToImages + fileName, FileMode.Open, FileAccess.Read, FileShare.Read);
+
+			ResultText.text += "\nCreating request object";
+			var request = new PostObjectRequest()
+			{
+				Bucket = S3_BUCKET_NAME,
+				Key = fileName,
+				InputStream = stream,
+				CannedACL = S3CannedACL.PublicRead,
+				Region = _S3Region,
+				ContentType = "image/png"
+				//ContentType = "audio/wav"
+			};
+
+			ResultText.text += "\nMaking HTTP post call";
+
+			Client.PostObjectAsync(request, (responseObj) =>
+				{
+					if (responseObj.Exception == null)
+					{
+						ResultText.text += string.Format("\nobject {0} posted to bucket {1}", responseObj.Request.Key, responseObj.Request.Bucket);
+						Debug.Log(URL_FIRST_PARTH + fileName);
+					}
+					else
+					{
+						Debug.Log(responseObj.Exception);
+						ResultText.text += "\nException while posting the result object";
+						ResultText.text += string.Format("\n receieved error {0}", responseObj.Response.HttpStatusCode.ToString());
+					}
+				});
+		}
 
         /// <summary>
         /// Get Objects from S3 Bucket
