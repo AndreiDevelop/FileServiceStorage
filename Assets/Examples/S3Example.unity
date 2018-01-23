@@ -890,7 +890,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9fa7de8866404054591507da4f1293de, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _pathToImages: /Arts/
+  _pathToImages: /File Storage Service/Arts/
   _pathToAudio: /Audio/
   IdentityPoolId: 
   CognitoIdentityRegion: us-east-1
