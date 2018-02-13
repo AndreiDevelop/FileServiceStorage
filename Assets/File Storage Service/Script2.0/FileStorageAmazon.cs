@@ -13,14 +13,7 @@ public class FileStorageAmazon : MonoBehaviour, IFileStorageService
 	private const string URL_FIRST_PARTH = "https://s3.amazonaws.com/" + S3_BUCKET_NAME + "/";
 	private const string ACCESS_KEY = "AKIAJHPTOQGQXX5USTNA";
 	private const string SECRET_KEY = "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";
-
-	#endregion
-
-	#region content type region
-
-	private const string CONTENT_TYPE_TEXT = "text/plain";
-	private const string CONTENT_TYPE_IMAGE = "image/png";
-	private const string CONTENT_TYPE_AUDIO = "audio/wav";
+	private const string EMPTY_URL = "empty_url.com";
 
 	#endregion
 
@@ -72,9 +65,10 @@ public class FileStorageAmazon : MonoBehaviour, IFileStorageService
 		AWSConfigs.CorrectForClockSkew = true;
 	}
 
-	public void UploadFile(FileType type, string pathToFile, string fileName)
+	public string UploadFile(FileType type, string pathToFile, string fileName)
 	{
-		var stream = new FileStream(Application.dataPath + pathToFile + fileName, FileMode.Open, FileAccess.Read, FileShare.Read);
+		//string urlPathToFile = EMPTY_URL;
+		var stream = new FileStream(/*Application.dataPath + */pathToFile + fileName, FileMode.Open, FileAccess.Read, FileShare.Read);
 
 		var request = new PostObjectRequest()
 		{
@@ -90,13 +84,44 @@ public class FileStorageAmazon : MonoBehaviour, IFileStorageService
 		{
 			if (responseObj.Exception == null)
 			{
-				Debug.Log(URL_FIRST_PARTH + fileName);
+				//urlPathToFile = URL_FIRST_PARTH + fileName;
 			}
 			else
 			{
-				Debug.Log(responseObj.Exception);
+				//Debug.Log(responseObj.Exception);
 			}
 		});
+        print(URL_FIRST_PARTH + fileName);
+		return URL_FIRST_PARTH + fileName;
+	}
+
+	public string UploadFile(FileType type, Stream stream, string fileName)
+	{
+		//string urlPathToFile = EMPTY_URL;
+
+		var request = new PostObjectRequest()
+		{
+			Bucket = S3_BUCKET_NAME,
+			Key = fileName,
+			InputStream = stream,
+			CannedACL = S3CannedACL.PublicRead,
+			Region = _S3Region,
+			ContentType = GetContentType(type)
+		};
+
+		Client.PostObjectAsync(request, (responseObj) =>
+			{
+				if (responseObj.Exception == null)
+				{
+					//Debug.Log(URL_FIRST_PARTH + fileName);
+				}
+				else
+				{
+					//Debug.Log(responseObj.Exception);
+				}
+			});
+				
+		return URL_FIRST_PARTH + fileName;
 	}
 
 	private string GetContentType(FileType type)
@@ -106,13 +131,13 @@ public class FileStorageAmazon : MonoBehaviour, IFileStorageService
 		switch (type) 
 		{
 			case FileType.Text:
-				contentType = CONTENT_TYPE_TEXT; 
+				contentType = ContentType.TXT; 
 				break;
 			case FileType.Image:
-				contentType = CONTENT_TYPE_IMAGE;
+				contentType = ContentType.PNG;
 				break;
 			case FileType.Audio:
-				contentType = CONTENT_TYPE_AUDIO;
+				contentType = ContentType.MP3;
 				break;
 		}
 
